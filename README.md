@@ -6,5 +6,6 @@ This watchface uses Javascript to retrieve the user's timezone from the phone so
 
 Download from the Pebble App Store: http://pblweb.com/appstore/534ff65f3d49c5991f000204/
 
+<img src="screenshot.png">
 
 <a href="http://twitter.com/BalestraPatrick">@BalestraPatrick</a>
