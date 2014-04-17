@@ -1,0 +1,33 @@
+{
+  "uuid": "981444e9-fe21-46ce-8814-f2a8710be60a",
+  "shortName": "WWDC",
+  "longName": "WWDC",
+  "companyName": "PatrickBalestra",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+    
+  },
+  "resources": {
+    "media": [
+        {
+            "type" : "png",
+            "name" : "WWDC14",
+            "file" : "images/WWDC14.png"
+        },
+        {
+            "type" : "png",
+            "name" : "WWDC14TEXT",
+            "file" : "images/WWDC14Text.png"
+        },
+        {
+            "type" : "font",
+            "name" : "FONT_GEOSANS_LIGHT_26",
+            "file" : "fonts/GeosansLight.ttf"
+        }
+      ]
+  }
+}
