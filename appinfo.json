@@ -27,6 +27,11 @@
             "type" : "font",
             "name" : "FONT_GEOSANS_LIGHT_26",
             "file" : "fonts/GeosansLight.ttf"
+        },
+        {
+            "type" : "png",
+            "name" : "TIMCOOK",
+            "file" : "images/TimCook.png"
         }
       ]
   }

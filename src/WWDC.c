@@ -5,6 +5,7 @@
  Part of the code for the countdown by Kernel Sanders: https://github.com/kernel-sanders/Time-Until-Pebble
  
 */
+
 #include <pebble.h>
 
 #define COUNTDOWN 1401728400 // WWDC Date in unix format (GMT+0 timezone)
@@ -16,9 +17,11 @@ TextLayer *text_countdown_layer;
 
 BitmapLayer *logo_image_layer;
 BitmapLayer *text_image_layer;
+BitmapLayer *tim_cook_image_layer;
 
 GBitmap *logo_image;
 GBitmap *text_image;
+GBitmap *tim_cook_image;
 
 GFont dolce_vita_font;
 
@@ -29,7 +32,6 @@ int current_timezone_offset = 0;
 void in_received_handler(DictionaryIterator *received, void *context) {
     Tuple *offsetTuple = dict_find(received, 1);
     current_timezone_offset = offsetTuple->value->uint8;
-    //APP_LOG(APP_LOG_LEVEL_DEBUG, "Received timezone offset = %u",  offsetTuple->value->uint8);
 }
 
 void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -61,10 +63,25 @@ void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
 	hours = (timeRemaining/3600) - days*24;
 	minutes = (timeRemaining/60) - days*1440 - hours*60;
 	seconds = (timeRemaining) - days*86400 - hours*3600 - minutes*60;
-	   
-    snprintf(countdownString, sizeof(countdownString), "%d %d %d %d", days, hours, minutes, seconds);
+    
+    if (days <= 0 && hours <= 0 && minutes <= 0) {
+        snprintf(countdownString, sizeof(countdownString), "%d", seconds);
+    } else if (days <= 0 && hours <= 0) {
+        snprintf(countdownString, sizeof(countdownString), "%d %d", minutes, seconds);
+    } else if (days <= 0) {
+        snprintf(countdownString, sizeof(countdownString), "%d %d %d", hours, minutes, seconds);
+    } else {
+        snprintf(countdownString, sizeof(countdownString), "%d %d %d %d", days, hours, minutes, seconds);
+    }
 
     text_layer_set_text(text_countdown_layer, countdownString);
+    
+    // Guess this feature *__*
+    if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
+        layer_set_hidden(bitmap_layer_get_layer(logo_image_layer), true);
+        layer_set_hidden(bitmap_layer_get_layer(text_image_layer), true);
+        layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), false);
+    }
 
 }
 
@@ -108,7 +125,13 @@ void handle_init(void) {
 	text_layer_set_text_alignment(text_countdown_layer, GTextAlignmentCenter);
     text_layer_set_background_color(text_countdown_layer, GColorClear);
 	layer_add_child(window_layer, text_layer_get_layer(text_countdown_layer));
-	
+    
+    tim_cook_image = gbitmap_create_with_resource(RESOURCE_ID_TIMCOOK);
+    tim_cook_image_layer = bitmap_layer_create(GRect(0, 0, 144, 168));
+    bitmap_layer_set_bitmap(tim_cook_image_layer, tim_cook_image);
+    layer_add_child(window_layer, bitmap_layer_get_layer(tim_cook_image_layer));
+	layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), true);
+    
 	tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
     
 }
