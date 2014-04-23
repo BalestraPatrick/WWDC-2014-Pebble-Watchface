@@ -40,7 +40,16 @@ void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
 	strftime(time_text, sizeof(time_text), "%R", tick_time);
 	text_layer_set_text(text_time_layer, time_text);
 	
-	unsigned int unix_time = time(NULL);
+	unsigned int unix_time;
+	unix_time = ((-current_timezone_offset)*3600) + /* time zone offset */
+    + tick_time->tm_sec /* start with seconds */
+    + tick_time->tm_min*60 /* add minutes */
+    + tick_time->tm_hour*3600 /* add hours */
+    + tick_time->tm_yday*86400 /* add days */
+    + (tick_time->tm_year-70)*31536000 /* add years since 1970 */
+    + ((tick_time->tm_year-69)/4)*86400 /* add a day after leap years, starting in 1973 */
+    - ((tick_time->tm_year-1)/100)*86400 /* remove a leap day every 100 years, starting in 2001 */
+    + ((tick_time->tm_year+299)/400)*86400; /* add a leap day back every 400 years, starting in 2001*/
 	
 	int days;
 	int hours;
