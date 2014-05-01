@@ -36,8 +36,12 @@ void in_received_handler(DictionaryIterator *received, void *context) {
 
 void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
 	static char time_text[] = "00:00";
-    
-	strftime(time_text, sizeof(time_text), "%R", tick_time);
+	
+	if (clock_is_24h_style()) {
+		strftime(time_text, sizeof(time_text), "%H:%M", tick_time);
+	} else {
+		strftime(time_text, sizeof(time_text), "%I:%M", tick_time);
+	}
 	text_layer_set_text(text_time_layer, time_text);
 	
 	unsigned int unix_time = time(NULL);
