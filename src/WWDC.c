@@ -27,11 +27,13 @@ GFont dolce_vita_font;
 
 int current_timezone_offset = 0;
 
+bool tim_cook_visible = false;
+
 // Functions
 
 void in_received_handler(DictionaryIterator *received, void *context) {
     Tuple *offsetTuple = dict_find(received, 1);
-    current_timezone_offset = offsetTuple->value->uint8;
+    current_timezone_offset = offsetTuple->value->int8;
 }
 
 void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -53,6 +55,7 @@ void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
     int seconds;
     
     static char countdownString[] = "XXX : XX : XX : XX";
+    
 	
     int timeRemaining = COUNTDOWN - (int)unix_time;
 	days = (timeRemaining/86400);
@@ -70,15 +73,32 @@ void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
         snprintf(countdownString, sizeof(countdownString), "%d %d %d %d", days, hours, minutes, seconds);
     }
 
-    text_layer_set_text(text_countdown_layer, countdownString);
-    
     // Guess this feature *__*
     if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
+        /*
         layer_set_hidden(bitmap_layer_get_layer(logo_image_layer), true);
         layer_set_hidden(bitmap_layer_get_layer(text_image_layer), true);
         layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), false);
+        tim_cook_visible = true;*/
+        snprintf(countdownString, sizeof(countdownString), "Have fun!");
     }
 
+    text_layer_set_text(text_countdown_layer, countdownString);
+}
+
+static void acceleration_tap_handler (AccelAxisType axis, int32_t direction) {
+    if (tim_cook_visible) {
+        layer_set_hidden(bitmap_layer_get_layer(logo_image_layer), false);
+        layer_set_hidden(bitmap_layer_get_layer(text_image_layer), false);
+        layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), true);
+        
+        tim_cook_visible = false;
+    } else {layer_set_hidden(bitmap_layer_get_layer(logo_image_layer), true);
+        layer_set_hidden(bitmap_layer_get_layer(text_image_layer), true);
+        layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), false);
+        
+        tim_cook_visible = true;
+    }
 }
 
 void handle_init(void) {
@@ -129,10 +149,12 @@ void handle_init(void) {
 	layer_set_hidden(bitmap_layer_get_layer(tim_cook_image_layer), true);
     
 	tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
+    accel_tap_service_subscribe(&acceleration_tap_handler);
     
 }
 
 void handle_deinit(void) {
+    accel_tap_service_unsubscribe();
 	text_layer_destroy(text_time_layer);
 	text_layer_destroy(text_date_layer);
 	text_layer_destroy(text_countdown_layer);
